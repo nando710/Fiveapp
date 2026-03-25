@@ -238,7 +238,7 @@ export default function TeacherDashboardScreen() {
                       {/* Botão */}
                       <Pressable
                         style={styles.iniciarBtn}
-                        onPress={() => router.push(`/(teacher)/class/${cls.id}`)}
+                        onPress={() => router.push(`/(teacher)/session/${cls.id}`)}
                       >
                         <Text style={styles.iniciarText}>Iniciar aula</Text>
                         <Ionicons name="arrow-forward" size={14} color="#fff" />

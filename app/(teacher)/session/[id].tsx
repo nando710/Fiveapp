@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   View, Text, ScrollView, Pressable, StyleSheet,
   TextInput, Animated, KeyboardAvoidingView, Platform,
@@ -10,7 +10,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useUiStore } from '@stores/uiStore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -143,8 +142,6 @@ const TABS = ['Chamada', 'Dificuldades', 'Notas'];
 
 export default function ClassSessionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const setExerciseOpen = useUiStore((s) => s.setExerciseOpen);
-
   const classInfo = CLASS_DATA[id] ?? CLASS_DATA['cl4'];
 
   const [activeTab, setActiveTab] = useState(0);
@@ -156,11 +153,6 @@ export default function ClassSessionScreen() {
   const [notes, setNotes] = useState('');
   const [noteSent, setNoteSent] = useState(false);
   const tabAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    setExerciseOpen(true);
-    return () => setExerciseOpen(false);
-  }, []);
 
   const presentCount = classInfo.students.filter((s) => attendance[s.id] === 'present').length;
   const absentCount  = classInfo.students.length - presentCount;
@@ -449,7 +441,7 @@ export default function ClassSessionScreen() {
 const styles = StyleSheet.create({
   bg:   { flex: 1 },
   safe: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 40 },
+  scroll: { padding: 16, paddingBottom: 120 },
 
   // Header
   header: {

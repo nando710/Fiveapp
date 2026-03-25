@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     marginHorizontal: 16,
-    marginBottom: Platform.OS === 'ios' ? 8 : 16,
+    marginBottom: Platform.OS === 'ios' ? 100 : 90,
     borderRadius: 24,
     paddingHorizontal: 16,
     paddingVertical: 8,

@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   bookChipTextActive: { color: '#fff' },
 
   listWrap: { flex: 1 },
-  list:     { paddingHorizontal: 16 },
+  list:     { paddingHorizontal: 16, paddingBottom: 110 },
 
   unitBlock: { marginBottom: 8 },
   unitHeader: {

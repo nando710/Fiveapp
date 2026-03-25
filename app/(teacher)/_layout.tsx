@@ -20,9 +20,9 @@ export default function TeacherLayout() {
       <Tabs.Screen
         name="diary"
         options={{
-          title: 'Diário',
+          title: 'Correções',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'journal' : 'journal-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'checkmark-done' : 'checkmark-done-outline'} size={22} color={color} />
           ),
         }}
       />
@@ -53,7 +53,7 @@ export default function TeacherLayout() {
           ),
         }}
       />
-      <Tabs.Screen name="class/[id]" options={{ href: null }} />
+      <Tabs.Screen name="session/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
