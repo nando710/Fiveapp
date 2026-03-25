@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "FiveApp",
+    "slug": "fiveapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "fiveapp",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1030"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.fiveapp.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1a1030"
+      },
+      "package": "com.fiveapp.mobile"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "O FiveApp precisa acessar sua câmera para os Stories e Realidade Aumentada."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#7B5CF0"
+        }
+      ],
+      "expo-video"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
