@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
   summaryCard: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 14,
     overflow: 'hidden',
     borderWidth: 1,
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   },
   diffLeft: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, flex: 1 },
   diffDot: { width: 8, height: 8, borderRadius: 4, marginTop: 5, flexShrink: 0 },
-  diffTopic: { fontFamily: 'Nunito_600SemiBold', fontSize: 13, color: '#333', flex: 1 },
+  diffTopic: { fontFamily: 'Nunito_600SemiBold', fontSize: 13, color: '#1a1030', flex: 1 },
   diffRate: { fontFamily: 'Nunito_800ExtraBold', fontSize: 14, flexShrink: 0 },
   barsSection: {
     marginTop: 8,
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
 
   // Risk students
   riskCard: {
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 14,
     overflow: 'hidden',
     borderWidth: 1,
@@ -630,7 +630,7 @@ const styles = StyleSheet.create({
 
   // Notes
   noteInfoCard: {
-    borderRadius: 14,
+    borderRadius: 18,
     padding: 14,
     overflow: 'hidden',
     borderWidth: 1,

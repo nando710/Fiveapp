@@ -125,7 +125,8 @@ admin      → app/(admin)/
 #### M2.3 — Agenda Dinâmica
 - [x] Grade semanal de horários (Seg–Sáb, navegável)
 - [x] Classes por dia com sala, duração e alunos
-- [x] Solicitações de reposição com aprovar/recusar
+- [x] Resumo e anotações de aulas (notas do professor por turma)
+- [x] Anotações sobre alunos (avaliações e observações)
 
 #### M2.4 — Avaliação
 - [x] Seletor de turma + lista de alunos
@@ -135,8 +136,8 @@ admin      → app/(admin)/
 - [ ] Envio real de áudio ao aluno (requer backend)
 
 #### M2.5 — Comunidade
-- [ ] Feed de stories dos alunos da unidade
-- [ ] Curtir stories
+- [x] Stories dos alunos no dashboard do professor
+- [x] Curtir stories (botão coração animado no StoryViewer)
 
 #### M2.6 — Perfil
 - [x] Dados do professor (nome, unidade, desde)
@@ -148,68 +149,78 @@ admin      → app/(admin)/
 ### 🏢 MÓDULO 3 — Franqueado (`franchise`)
 
 #### M3.1 — Termômetro de Churn *(Home do franqueado)*
-- [ ] Lista de alunos em risco (cruzamento de faltas + ausência de homeworks)
-- [ ] Score de risco por aluno
-- [ ] Ação rápida: enviar mensagem / ligar / registrar contato
+- [x] Stats da unidade (alunos, turmas, retenção)
+- [x] Lista de alunos em risco com score colorido (vermelho/âmbar/verde)
+- [x] Mini stats por aluno (faltas, HWs perdidos, último contato)
+- [x] Ações rápidas: Ligar + Registrar contato
+- [x] Banner de alerta para risco crítico
 
 #### M3.2 — Gestão da Unidade
-- [ ] CRUD de alunos (cadastrar, editar, inativar)
-- [ ] CRUD de professores
-- [ ] Criação de turmas e definição de grade horária
-- [ ] Vinculação aluno ↔ turma
+- [x] Lista de alunos com status (ativo/inativo) e busca
+- [x] Lista de professores com stats (turmas, alunos, desde)
+- [x] Lista de turmas com professor, dias, sala e alunos
+- [x] Tabs navegáveis (Alunos / Professores / Turmas)
+- [ ] Formulários de cadastro/edição (requer backend)
 
 #### M3.3 — Auditoria Pedagógica
-- [ ] Visão global do preenchimento de diários pelos professores
-- [ ] Identificação de atrasos e inconsistências
-- [ ] Relatório exportável
+- [x] Card de progresso geral com ring SVG animado
+- [x] Breakdown por professor com barras de progresso por turma
+- [x] Coloração por threshold (verde ≥90%, âmbar ≥70%, vermelho <70%)
+- [ ] Relatório exportável (requer backend)
 
 #### M3.4 — Controle Operacional
-- [ ] Fila de aprovação de reposições solicitadas pelos alunos
-- [ ] Cadastro de parceiros para o Clube de Convênios
+- [x] Fila de reposições com aprovar/recusar e contadores por status
+- [x] Cadastro de parceiros com toggle ativo/inativo e botão "Novo Parceiro"
 
 #### M3.5 — Comunicação
-- [ ] Disparo de push notifications em massa para alunos da unidade
-- [ ] Moderação de stories (aprovar / remover)
-- [ ] Caixa de entrada para comunicados da franqueadora
+- [x] Botão "Novo Push" + histórico de pushes enviados com taxa de abertura
+- [x] Moderação de stories com aprovar/remover
+- [x] Caixa de entrada da franqueadora com indicador de não lido
 
 #### M3.6 — Perfil
-- [ ] Dados da unidade
-- [ ] Configurações locais
+- [x] Header com dados da unidade, proprietário, endereço
+- [x] Stats 2x2 (alunos, professores, turmas, retenção)
+- [x] Ações rápidas (configurações, suporte)
+- [x] Logout
 
 ---
 
 ### 👑 MÓDULO 4 — Admin / Franqueadora (`admin`)
 
 #### M4.1 — Dashboard Global *(Home do admin)*
-- [ ] Ranking de franquias por engajamento no app
-- [ ] Métricas de retenção por unidade
-- [ ] Saúde financeira consolidada
-- [ ] Filtros por período e região
+- [x] Stats scroll horizontal (unidades, alunos, professores, retenção, engajamento)
+- [x] Alertas por unidade com severity (crítico/atenção)
+- [x] Ranking de franquias com sort por retenção/engajamento
+- [x] Trend arrows (up/stable/down) e medalhas top 3
 
 #### M4.2 — CMS Pedagógico
-- [ ] Cadastro da árvore: Nível → Livro → Unidade → Lição
-- [ ] Upload de arquivos: áudios, gabaritos, simulados
-- [ ] Upload de marcadores AR
-- [ ] Publicação e versionamento de conteúdo
+- [x] Árvore de conteúdo colapsável: Nível → Livro (units, lessons, audios)
+- [x] Uploads recentes com tipo (áudio, gabarito, simulado, AR)
+- [x] Botão de upload + editar por livro
+- [ ] Upload real de arquivos (requer backend)
 
 #### M4.3 — Gestão de Rede
-- [ ] Abertura de novas unidades
-- [ ] Suspensão de acesso por inadimplência
-- [ ] Auditoria transparente (visualizar sistema na ótica de qualquer franqueado)
+- [x] Lista de unidades com filtro (Todas / Ativas / Suspensas)
+- [x] Card por unidade: owner, city, students, teachers, status, pagamento
+- [x] Botão "Nova Unidade" + "Visualizar como franqueado"
+- [ ] Abertura real de unidades (requer backend)
 
 #### M4.4 — Guardião do Método
-- [ ] Configuração dos prompts do Tutor de IA
-- [ ] Regras de pontuação da gamificação
-- [ ] Controle de versão das regras
+- [x] Visualização do prompt do Tutor de IA + "Editar Prompt"
+- [x] Regras de pontuação da gamificação + "Editar Regras"
+- [ ] Controle de versão (requer backend)
 
 #### M4.5 — Megafone
-- [ ] Criação de campanhas globais
-- [ ] Disparo de push notifications para 100% da base
-- [ ] Histórico de campanhas enviadas
+- [x] Botão "Nova Campanha" com alcance total
+- [x] Lista de campanhas com filtro (Todas / Agendadas / Enviadas)
+- [x] Open rate por campanha + cancelar agendadas
+- [x] Histórico completo
 
 #### M4.6 — Perfil
-- [ ] Dados da franqueadora
-- [ ] Gestão de administradores
+- [x] Header com dados da franqueadora + badge "Desde"
+- [x] Stats 2x2 (unidades, alunos, professores, cidades)
+- [x] Lista de administradores + "Adicionar"
+- [x] Logout
 
 ---
 

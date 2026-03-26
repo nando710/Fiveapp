@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -12,6 +12,7 @@ import {
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider } from '@theme/ThemeContext';
 import { useAuthStore } from '@stores/authStore';
+import { AnimatedSplash } from '@components/ui/AnimatedSplash';
 import type { UserRole } from '@/types';
 
 const queryClient = new QueryClient({
@@ -60,6 +61,8 @@ export default function RootLayout() {
     Nunito_900Black,
   });
 
+  const [splashDone, setSplashDone] = useState(false);
+
   if (!fontsLoaded) return null;
 
   return (
@@ -68,6 +71,7 @@ export default function RootLayout() {
         <ThemeProvider>
           <AuthGuard />
           <Stack screenOptions={{ headerShown: false, animation: 'fade' }} />
+          {!splashDone && <AnimatedSplash onFinish={() => setSplashDone(true)} />}
         </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

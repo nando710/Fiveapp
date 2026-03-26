@@ -301,7 +301,9 @@ export default function StudentHomeScreen() {
                     step={3}
                     current={7}
                     total={12}
-                    title="Book 3 — Unit 2 · Lesson 7"
+                    title="Discover One — Unit 2 · Lesson 7"
+                    bookCover={require('../../assets/book-discover-one.png')}
+                    onPress={() => router.push('/(student)/journey' as any)}
                   />
                 </Animated.View>
 
@@ -316,12 +318,14 @@ export default function StudentHomeScreen() {
                         label="Homeworks"
                         gradient={['#4a9e50', '#1a4d20']}
                         mascot={<HomeworksMascot size={85} />}
+                        backgroundImage={require('../../assets/card-homeworks.png')}
                         onPress={() => router.push('/(student)/homeworks')}
                       />
                       <MenuCard
                         label="Five AI"
                         gradient={['#6a3fa3', '#2a0a60']}
                         mascot={<AiMascot size={85} />}
+                        backgroundImage={require('../../assets/card-ai.png')}
                         onPress={() => router.push('/(student)/ai')}
                       />
                     </View>
@@ -330,12 +334,14 @@ export default function StudentHomeScreen() {
                         label="Reposições"
                         gradient={['#388E3C', '#1B5E20']}
                         mascot={<ReposicoesMascot size={85} />}
+                        backgroundImage={require('../../assets/card-reposicoes.png')}
                         onPress={() => router.push('/(student)/profile?tab=2')}
                       />
                       <MenuCard
                         label="Notas"
                         gradient={['#1565C0', '#062a6e']}
                         mascot={<NotasMascot size={85} />}
+                        backgroundImage={require('../../assets/card-notas.png')}
                         onPress={() => router.push('/(student)/profile?tab=0')}
                       />
                     </View>
@@ -344,12 +350,14 @@ export default function StudentHomeScreen() {
                         label="Listen"
                         gradient={['#C2185B', '#880E4F']}
                         mascot={<ListenMascot size={85} />}
+                        backgroundImage={require('../../assets/card-listen.png')}
                         onPress={() => router.push('/(student)/listen')}
                       />
                       <MenuCard
                         label="Realidade Aumentada"
                         gradient={['#00897B', '#004D40']}
                         mascot={<ArMascot size={85} />}
+                        backgroundImage={require('../../assets/card-ar.png')}
                         onPress={() => router.push('/(student)/ar')}
                       />
                     </View>

@@ -1,15 +1,19 @@
 import { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, Animated, Easing } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Platform, Animated, Easing } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ProgressCardProps {
   step: number;
   current: number;
   total: number;
   title: string;
+  bookCover?: string | number;
+  onPress?: () => void;
 }
 
-export function ProgressCard({ step, current, total, title }: ProgressCardProps) {
+export function ProgressCard({ step, current, total, title, bookCover, onPress }: ProgressCardProps) {
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -32,11 +36,23 @@ export function ProgressCard({ step, current, total, title }: ProgressCardProps)
     : { intensity: 55, tint: 'light' as const, style: styles.card };
 
   return (
+    <Pressable onPress={onPress} disabled={!onPress}>
     <Wrapper {...(wrapperProps as any)}>
-      <View style={styles.stepCol}>
-        <Text style={styles.stepLbl}>Step</Text>
-        <Text style={styles.stepNum}>{step}</Text>
-      </View>
+      {/* Book cover or step number */}
+      {bookCover ? (
+        <View style={styles.bookWrap}>
+          <Image
+            source={typeof bookCover === 'string' ? { uri: bookCover } : bookCover}
+            style={styles.bookImg}
+            contentFit="cover"
+          />
+        </View>
+      ) : (
+        <View style={styles.stepCol}>
+          <Text style={styles.stepLbl}>Step</Text>
+          <Text style={styles.stepNum}>{step}</Text>
+        </View>
+      )}
       <View style={styles.right}>
         <View style={styles.topRow}>
           <Text style={styles.title} numberOfLines={1}>{title}</Text>
@@ -45,11 +61,15 @@ export function ProgressCard({ step, current, total, title }: ProgressCardProps)
         <View style={styles.track}>
           <Animated.View style={[styles.fill, { width: barWidth }]} />
         </View>
-        <Text style={styles.hint}>
-          {Math.round((current / total) * 100)}% concluído
-        </Text>
+        <View style={styles.hintRow}>
+          <Text style={styles.hint}>
+            {Math.round((current / total) * 100)}% concluído
+          </Text>
+          {onPress && <Ionicons name="chevron-forward" size={14} color="#10B981" />}
+        </View>
       </View>
     </Wrapper>
+    </Pressable>
   );
 }
 
@@ -73,6 +93,24 @@ const styles = StyleSheet.create({
   androidFallback: {
     backgroundColor: 'rgba(255,255,255,0.82)',
   },
+  // Book cover
+  bookWrap: {
+    width: 56,
+    height: 72,
+    borderRadius: 8,
+    overflow: 'hidden',
+    flexShrink: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  bookImg: {
+    width: '100%',
+    height: '100%',
+  },
+  // Step fallback
   stepCol: { flexShrink: 0, alignItems: 'center' },
   stepLbl: {
     fontFamily: 'Nunito_800ExtraBold',
@@ -117,6 +155,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 6,
   },
+  hintRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   hint: {
     fontFamily: 'Nunito_600SemiBold',
     fontSize: 11,

@@ -55,6 +55,7 @@ export default function StudentLayout() {
       />
       <Tabs.Screen name="ar" options={{ href: null }} />
       <Tabs.Screen name="homework/[id]" options={{ href: null }} />
+      <Tabs.Screen name="journey" options={{ href: null }} />
     </Tabs>
   );
 }

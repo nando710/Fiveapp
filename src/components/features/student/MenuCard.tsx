@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
 
 interface MenuCardProps {
@@ -10,9 +11,10 @@ interface MenuCardProps {
   mascot: ReactNode;
   onPress: () => void;
   fullWidth?: boolean;
+  backgroundImage?: string | number;
 }
 
-export function MenuCard({ label, gradient, mascot, onPress, fullWidth }: MenuCardProps) {
+export function MenuCard({ label, gradient, mascot, onPress, fullWidth, backgroundImage }: MenuCardProps) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -24,13 +26,29 @@ export function MenuCard({ label, gradient, mascot, onPress, fullWidth }: MenuCa
 
   return (
     <Animated.View style={[styles.card, fullWidth && styles.fullWidth, { transform: [{ scale }] }]}>
-      {/* Fundo gradiente */}
-      <LinearGradient
-        colors={gradient}
-        style={StyleSheet.absoluteFill}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
+      {/* Fundo: imagem ou gradiente */}
+      {backgroundImage ? (
+        <Image
+          source={typeof backgroundImage === 'string' ? { uri: backgroundImage } : backgroundImage}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+        />
+      ) : (
+        <LinearGradient
+          colors={gradient}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+      )}
+      {/* Overlay escuro para legibilidade */}
+      {backgroundImage && (
+        <LinearGradient
+          colors={['rgba(0,0,0,0.15)', 'rgba(0,0,0,0.35)']}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
+      )}
       {/* Shine diagonal */}
       <LinearGradient
         colors={['rgba(255,255,255,0.18)', 'transparent', 'rgba(0,0,0,0.08)']}
@@ -39,10 +57,12 @@ export function MenuCard({ label, gradient, mascot, onPress, fullWidth }: MenuCa
         end={{ x: 1, y: 1 }}
         pointerEvents="none"
       />
-      {/* Mascote */}
-      <View style={styles.mascotWrap} pointerEvents="none">
-        {mascot}
-      </View>
+      {/* Mascote (hidden when using background image) */}
+      {!backgroundImage && (
+        <View style={styles.mascotWrap} pointerEvents="none">
+          {mascot}
+        </View>
+      )}
       {/* Label glass */}
       <BlurView intensity={50} tint="light" style={styles.labelWrap} pointerEvents="none">
         <Text style={styles.label}>{label}</Text>

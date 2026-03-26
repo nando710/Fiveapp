@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-  Animated,
-  Image,
+  View, Text, ScrollView, Pressable, StyleSheet, Animated,
 } from 'react-native';
 import { useStaggeredEntry } from '@hooks/useStaggeredEntry';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,20 +22,29 @@ interface ClassItem {
   isReposicao?: boolean;
 }
 
-interface PendingRequest {
+interface ClassNote {
   id: string;
-  student: string;
-  avatar: string;
-  class: string;
-  requestedDate: string;
-  requestedTime: string;
-  reason: string;
+  classId: string;
+  className: string;
+  date: string;
+  note: string;
+  icon: string;
+  color: string;
+}
+
+interface StudentNote {
+  id: string;
+  studentName: string;
+  studentAvatar: string;
+  className: string;
+  date: string;
+  type: 'evaluation' | 'observation';
+  note: string;
 }
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const WEEK_DAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-// Today = 2026-03-25 = Wednesday = index 2
 const WEEK_DATES = ['23', '24', '25', '26', '27', '28'];
 
 const SCHEDULE: Record<number, ClassItem[]> = {
@@ -64,24 +68,49 @@ const SCHEDULE: Record<number, ClassItem[]> = {
   ],
 };
 
-const INITIAL_PENDING: PendingRequest[] = [
+const CLASS_NOTES: ClassNote[] = [
   {
-    id: 'r1',
-    student: 'Pedro S.',
-    avatar: 'https://i.pravatar.cc/150?img=15',
-    class: 'Book 3 — 19h',
-    requestedDate: '28/03 — Sáb',
-    requestedTime: '09:00',
-    reason: 'Viagem de trabalho',
+    id: 'cn1', classId: 'cl3', className: 'Book 3 — 19h',
+    date: 'Qua, 25/03', icon: 'document-text-outline', color: '#7B5CF0',
+    note: 'Turma avançou até p. 34 (Unit 2). Dificuldade geral com Present Perfect — revisar na próxima aula.',
   },
   {
-    id: 'r2',
-    student: 'Julia M.',
-    avatar: 'https://i.pravatar.cc/150?img=25',
-    class: 'Book 2 — 17h',
-    requestedDate: '29/03 — Dom',
-    requestedTime: '10:00',
-    reason: 'Consulta médica',
+    id: 'cn2', classId: 'cl2', className: 'Book 2 — 17h',
+    date: 'Qua, 25/03', icon: 'alert-circle-outline', color: '#F59E0B',
+    note: 'Apenas 6 de 10 alunos presentes. Aplicar atividade extra de recuperação na sexta.',
+  },
+  {
+    id: 'cn3', classId: 'cl1', className: 'Book 1 — 08h',
+    date: 'Ter, 24/03', icon: 'checkmark-circle-outline', color: '#10B981',
+    note: 'Aula excelente. Todos os alunos entregaram homework. Vocabulário Unit 5 bem assimilado.',
+  },
+  {
+    id: 'cn4', classId: 'cl6', className: 'Book 3 — 19h',
+    date: 'Sex, 21/03', icon: 'document-text-outline', color: '#7B5CF0',
+    note: 'Realizei simulado oral. Maioria teve dificuldade com question tags. Reforçar na próxima Unit.',
+  },
+];
+
+const STUDENT_NOTES: StudentNote[] = [
+  {
+    id: 'sn1', studentName: 'Pedro S.', studentAvatar: 'https://i.pravatar.cc/150?img=15',
+    className: 'Book 3 — 19h', date: 'Qua, 25/03', type: 'observation',
+    note: '5ª falta consecutiva. Conversar com coordenação sobre risco de evasão.',
+  },
+  {
+    id: 'sn2', studentName: 'Camila R.', studentAvatar: 'https://i.pravatar.cc/150?img=47',
+    className: 'Book 3 — 19h', date: 'Qua, 25/03', type: 'evaluation',
+    note: 'Speaking nota 5.0 — muito abaixo do esperado. Sugerir aulas de reposição de conversação.',
+  },
+  {
+    id: 'sn3', studentName: 'Lucas A.', studentAvatar: 'https://i.pravatar.cc/150?img=10',
+    className: 'Book 1 — 08h', date: 'Ter, 24/03', type: 'evaluation',
+    note: 'Writing nota 9.5 — excelente evolução. Parabenizar e desafiar com exercícios avançados.',
+  },
+  {
+    id: 'sn4', studentName: 'Eduardo M.', studentAvatar: 'https://i.pravatar.cc/150?img=53',
+    className: 'Book 2 — 17h', date: 'Seg, 23/03', type: 'observation',
+    note: 'Aluno disperso durante toda a aula. Não trouxe material. Verificar com responsável.',
   },
 ];
 
@@ -89,20 +118,12 @@ const INITIAL_PENDING: PendingRequest[] = [
 
 export default function ScheduleScreen() {
   const [activeDay, setActiveDay] = useState(2);
-  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>(INITIAL_PENDING);
+  const [notesTab, setNotesTab] = useState<'aulas' | 'alunos'>('aulas');
 
   const { s } = useStaggeredEntry(3);
 
   const todayIndex = 2;
   const dayClasses = SCHEDULE[activeDay] ?? [];
-
-  const handleApprove = (id: string) => {
-    setPendingRequests((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  const handleReject = (id: string) => {
-    setPendingRequests((prev) => prev.filter((r) => r.id !== id));
-  };
 
   return (
     <LinearGradient colors={['#F0EFF5', '#E8E7EF', '#DDDCE8']} style={styles.bg}>
@@ -132,24 +153,18 @@ export default function ScheduleScreen() {
                     onPress={() => setActiveDay(index)}
                     style={[styles.dayChip, isActive && styles.dayChipActive]}
                   >
-                    <Text style={[styles.dayChipLabel, isActive && styles.dayChipLabelActive]}>
-                      {day}
-                    </Text>
-                    <Text style={[styles.dayChipDate, isActive && styles.dayChipDateActive]}>
-                      {WEEK_DATES[index]}
-                    </Text>
-                    {isToday && (
-                      <View style={[styles.todayDot, isActive && styles.todayDotActive]} />
-                    )}
+                    <Text style={[styles.dayChipLabel, isActive && styles.dayChipLabelActive]}>{day}</Text>
+                    <Text style={[styles.dayChipDate, isActive && styles.dayChipDateActive]}>{WEEK_DATES[index]}</Text>
+                    {isToday && <View style={[styles.todayDot, isActive && styles.todayDotActive]} />}
                   </Pressable>
                 );
               })}
             </View>
           </Animated.View>
 
-          {/* ── Schedule + Requests ── */}
+          {/* ── Schedule + Notes ── */}
           <Animated.View style={s(2)}>
-            {/* Classes for selected day */}
+            {/* Aulas do dia */}
             {dayClasses.length === 0 ? (
               <View style={styles.emptyState}>
                 <Ionicons name="calendar-outline" size={48} color="#C0BBDD" />
@@ -182,67 +197,88 @@ export default function ScheduleScreen() {
               ))
             )}
 
-            {/* ── Makeup class requests ── */}
+            {/* ── Resumo / Anotações ── */}
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Solicitações de Reposição</Text>
-              {pendingRequests.length > 0 && (
-                <View style={styles.countBadge}>
-                  <Text style={styles.countBadgeText}>{pendingRequests.length}</Text>
-                </View>
-              )}
+              <Ionicons name="clipboard-outline" size={20} color="#1a1030" />
+              <Text style={styles.sectionTitle}>Resumo e Anotações</Text>
             </View>
 
-            {pendingRequests.length === 0 ? (
-              <View style={styles.cardShadow}>
-                <BlurView intensity={50} tint="light" style={styles.emptyRequestsCard}>
-                  <Ionicons name="checkmark-circle-outline" size={28} color="#10B981" />
-                  <Text style={styles.emptyRequestsText}>Nenhuma solicitação pendente</Text>
+            {/* Tabs: Aulas / Alunos */}
+            <View style={styles.notesTabRow}>
+              <Pressable
+                onPress={() => setNotesTab('aulas')}
+                style={[styles.notesTab, notesTab === 'aulas' && styles.notesTabActive]}
+              >
+                <Ionicons name="book-outline" size={14} color={notesTab === 'aulas' ? '#fff' : '#888'} />
+                <Text style={[styles.notesTabText, notesTab === 'aulas' && styles.notesTabTextActive]}>
+                  Aulas ({CLASS_NOTES.length})
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setNotesTab('alunos')}
+                style={[styles.notesTab, notesTab === 'alunos' && styles.notesTabActive]}
+              >
+                <Ionicons name="person-outline" size={14} color={notesTab === 'alunos' ? '#fff' : '#888'} />
+                <Text style={[styles.notesTabText, notesTab === 'alunos' && styles.notesTabTextActive]}>
+                  Alunos ({STUDENT_NOTES.length})
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* ── Tab: Anotações das aulas ── */}
+            {notesTab === 'aulas' && CLASS_NOTES.map((cn) => (
+              <View key={cn.id} style={styles.cardShadow}>
+                <BlurView intensity={50} tint="light" style={styles.noteCard}>
+                  <View style={styles.noteHeader}>
+                    <View style={[styles.noteIconWrap, { backgroundColor: cn.color + '18' }]}>
+                      <Ionicons name={cn.icon as any} size={18} color={cn.color} />
+                    </View>
+                    <View style={styles.noteHeaderInfo}>
+                      <Text style={styles.noteClassName}>{cn.className}</Text>
+                      <Text style={styles.noteDate}>{cn.date}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.noteText}>{cn.note}</Text>
                 </BlurView>
               </View>
-            ) : (
-              pendingRequests.map((req) => (
-                <View key={req.id} style={styles.cardShadow}>
-                  <BlurView intensity={50} tint="light" style={styles.requestCard}>
-                    <View style={styles.requestTop}>
-                      <Image
-                        source={{ uri: req.avatar }}
-                        style={styles.requestAvatar}
+            ))}
+
+            {/* ── Tab: Anotações sobre alunos ── */}
+            {notesTab === 'alunos' && STUDENT_NOTES.map((sn) => (
+              <View key={sn.id} style={styles.cardShadow}>
+                <BlurView intensity={50} tint="light" style={styles.noteCard}>
+                  <View style={styles.noteHeader}>
+                    <Image
+                      source={{ uri: sn.studentAvatar }}
+                      style={styles.noteAvatar}
+                      contentFit="cover"
+                    />
+                    <View style={styles.noteHeaderInfo}>
+                      <Text style={styles.noteStudentName}>{sn.studentName}</Text>
+                      <Text style={styles.noteDate}>{sn.className} · {sn.date}</Text>
+                    </View>
+                    <View style={[
+                      styles.noteTypeBadge,
+                      sn.type === 'evaluation' ? styles.noteTypeEval : styles.noteTypeObs,
+                    ]}>
+                      <Ionicons
+                        name={sn.type === 'evaluation' ? 'star-outline' : 'eye-outline'}
+                        size={11}
+                        color={sn.type === 'evaluation' ? '#7B5CF0' : '#F59E0B'}
                       />
-                      <View style={styles.requestInfo}>
-                        <Text style={styles.requestStudent}>{req.student}</Text>
-                        <Text style={styles.requestClass}>{req.class}</Text>
-                      </View>
+                      <Text style={[
+                        styles.noteTypeBadgeText,
+                        sn.type === 'evaluation' ? styles.noteTypeEvalText : styles.noteTypeObsText,
+                      ]}>
+                        {sn.type === 'evaluation' ? 'Avaliação' : 'Observação'}
+                      </Text>
                     </View>
-                    <View style={styles.requestDetails}>
-                      <View style={styles.requestDetailRow}>
-                        <Ionicons name="calendar-outline" size={13} color="#7B5CF0" />
-                        <Text style={styles.requestDetailText}>
-                          {req.requestedDate} às {req.requestedTime}
-                        </Text>
-                      </View>
-                      <View style={styles.requestDetailRow}>
-                        <Ionicons name="chatbubble-outline" size={13} color="#888" />
-                        <Text style={styles.requestReason}>{req.reason}</Text>
-                      </View>
-                    </View>
-                    <View style={styles.requestActions}>
-                      <Pressable
-                        onPress={() => handleReject(req.id)}
-                        style={styles.rejectBtn}
-                      >
-                        <Text style={styles.rejectBtnText}>Recusar</Text>
-                      </Pressable>
-                      <Pressable
-                        onPress={() => handleApprove(req.id)}
-                        style={styles.approveBtn}
-                      >
-                        <Text style={styles.approveBtnText}>Aprovar</Text>
-                      </Pressable>
-                    </View>
-                  </BlurView>
-                </View>
-              ))
-            )}
+                  </View>
+                  <Text style={styles.noteText}>{sn.note}</Text>
+                </BlurView>
+              </View>
+            ))}
+
           </Animated.View>
         </ScrollView>
       </SafeAreaView>
@@ -253,301 +289,75 @@ export default function ScheduleScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  bg: {
-    flex: 1,
-  },
-  safe: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 110,
-    paddingHorizontal: 16,
-  },
+  bg: { flex: 1 },
+  safe: { flex: 1 },
+  scrollContent: { paddingBottom: 110, paddingHorizontal: 16 },
 
-  // Header
-  header: {
-    paddingTop: 20,
-    paddingBottom: 4,
-    marginBottom: 8,
-  },
-  headerTitle: {
-    fontFamily: 'Nunito_900Black',
-    fontSize: 26,
-    color: '#1a1030',
-  },
-  headerSub: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 14,
-    color: '#888',
-    marginTop: 2,
-  },
+  header: { paddingTop: 20, paddingBottom: 4, marginBottom: 8 },
+  headerTitle: { fontFamily: 'Nunito_900Black', fontSize: 26, color: '#1a1030' },
+  headerSub: { fontFamily: 'Nunito_600SemiBold', fontSize: 14, color: '#888', marginTop: 2 },
 
-  // Week selector
-  weekRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    gap: 5,
-  },
-  dayChip: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.55)',
-    minHeight: 64,
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  dayChipActive: {
-    backgroundColor: '#1a1030',
-    borderColor: '#1a1030',
-  },
-  dayChipLabel: {
-    fontFamily: 'Nunito_700Bold',
-    fontSize: 10,
-    color: '#888',
-    marginBottom: 2,
-  },
-  dayChipLabelActive: {
-    color: '#fff',
-  },
-  dayChipDate: {
-    fontFamily: 'Nunito_900Black',
-    fontSize: 15,
-    color: '#1a1030',
-  },
-  dayChipDateActive: {
-    color: '#fff',
-  },
-  todayDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: '#7B5CF0',
-    position: 'absolute',
-    bottom: 6,
-  },
-  todayDotActive: {
-    backgroundColor: '#C4B5FD',
-  },
+  weekRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, gap: 5 },
+  dayChip: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.55)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.55)', minHeight: 64, justifyContent: 'center', position: 'relative' },
+  dayChipActive: { backgroundColor: '#1a1030', borderColor: '#1a1030' },
+  dayChipLabel: { fontFamily: 'Nunito_700Bold', fontSize: 10, color: '#888', marginBottom: 2 },
+  dayChipLabelActive: { color: '#fff' },
+  dayChipDate: { fontFamily: 'Nunito_900Black', fontSize: 15, color: '#1a1030' },
+  dayChipDateActive: { color: '#fff' },
+  todayDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: '#7B5CF0', position: 'absolute', bottom: 6 },
+  todayDotActive: { backgroundColor: '#C4B5FD' },
 
-  // Empty state (no classes)
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 48,
-    gap: 12,
-  },
-  emptyText: {
-    fontFamily: 'Nunito_700Bold',
-    fontSize: 15,
-    color: '#B0ABCE',
-  },
+  emptyState: { alignItems: 'center', justifyContent: 'center', paddingVertical: 48, gap: 12 },
+  emptyText: { fontFamily: 'Nunito_700Bold', fontSize: 15, color: '#B0ABCE' },
 
-  // Card shadow wrapper
-  cardShadow: {
-    borderRadius: 18,
-    marginBottom: 12,
-    shadowColor: '#7B5CF0',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
+  cardShadow: { borderRadius: 18, marginBottom: 12, shadowColor: '#7B5CF0', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
 
-  // Class card
-  classCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.55)',
-    overflow: 'hidden',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 16,
-  },
-  classTimeCol: {
-    alignItems: 'center',
-    minWidth: 54,
-  },
-  classTime: {
-    fontFamily: 'Nunito_900Black',
-    fontSize: 22,
-    color: '#7B5CF0',
-  },
-  classInfo: {
-    flex: 1,
-    gap: 4,
-  },
-  classNameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  className: {
-    fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 15,
-    color: '#1a1030',
-  },
-  classMeta: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 12,
-    color: '#888',
-  },
-  studentsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  studentsText: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 12,
-    color: '#888',
-  },
-  reposicaoBadge: {
-    backgroundColor: '#FEF3C7',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-  },
-  reposicaoBadgeText: {
-    fontFamily: 'Nunito_700Bold',
-    fontSize: 10,
-    color: '#D97706',
-  },
+  classCard: { borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.55)', overflow: 'hidden', flexDirection: 'row', alignItems: 'center', padding: 16, gap: 16 },
+  classTimeCol: { alignItems: 'center', minWidth: 54 },
+  classTime: { fontFamily: 'Nunito_900Black', fontSize: 22, color: '#7B5CF0' },
+  classInfo: { flex: 1, gap: 4 },
+  classNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+  className: { fontFamily: 'Nunito_800ExtraBold', fontSize: 15, color: '#1a1030' },
+  classMeta: { fontFamily: 'Nunito_600SemiBold', fontSize: 12, color: '#888' },
+  studentsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  studentsText: { fontFamily: 'Nunito_600SemiBold', fontSize: 12, color: '#888' },
+  reposicaoBadge: { backgroundColor: '#FEF3C7', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, borderWidth: 1, borderColor: '#FDE68A' },
+  reposicaoBadgeText: { fontFamily: 'Nunito_700Bold', fontSize: 10, color: '#D97706' },
 
-  // Section header
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginTop: 8,
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 17,
-    color: '#1a1030',
-  },
-  countBadge: {
-    backgroundColor: '#7B5CF0',
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-  countBadgeText: {
-    fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 11,
-    color: '#fff',
-  },
+  // Section
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, marginBottom: 14 },
+  sectionTitle: { fontFamily: 'Nunito_800ExtraBold', fontSize: 17, color: '#1a1030' },
 
-  // Empty requests card
-  emptyRequestsCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.55)',
-    overflow: 'hidden',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    gap: 10,
+  // Notes tabs
+  notesTabRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  notesTab: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    paddingVertical: 10, borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.6)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.8)',
   },
-  emptyRequestsText: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 14,
-    color: '#10B981',
-  },
+  notesTabActive: { backgroundColor: '#1a1030', borderColor: '#1a1030' },
+  notesTabText: { fontFamily: 'Nunito_700Bold', fontSize: 13, color: '#888' },
+  notesTabTextActive: { color: '#fff' },
 
-  // Request card
-  requestCard: {
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.55)',
-    overflow: 'hidden',
-    padding: 16,
-    gap: 12,
+  // Note card
+  noteCard: {
+    borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.55)',
+    overflow: 'hidden', padding: 16, gap: 10,
   },
-  requestTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  requestAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#E0DCEF',
-  },
-  requestInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  requestStudent: {
-    fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 15,
-    color: '#1a1030',
-  },
-  requestClass: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 12,
-    color: '#7B5CF0',
-  },
-  requestDetails: {
-    gap: 6,
-    paddingLeft: 2,
-  },
-  requestDetailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  requestDetailText: {
-    fontFamily: 'Nunito_700Bold',
-    fontSize: 13,
-    color: '#444',
-  },
-  requestReason: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 12,
-    color: '#888',
-    flex: 1,
-  },
-  requestActions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  rejectBtn: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: '#EF4444',
-    borderRadius: 12,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  rejectBtnText: {
-    fontFamily: 'Nunito_700Bold',
-    fontSize: 13,
-    color: '#EF4444',
-  },
-  approveBtn: {
-    flex: 1,
-    backgroundColor: '#10B981',
-    borderRadius: 12,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  approveBtnText: {
-    fontFamily: 'Nunito_700Bold',
-    fontSize: 13,
-    color: '#fff',
-  },
+  noteHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  noteIconWrap: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  noteHeaderInfo: { flex: 1 },
+  noteClassName: { fontFamily: 'Nunito_800ExtraBold', fontSize: 14, color: '#1a1030' },
+  noteDate: { fontFamily: 'Nunito_600SemiBold', fontSize: 11, color: '#aaa', marginTop: 1 },
+  noteText: { fontFamily: 'Nunito_600SemiBold', fontSize: 13, color: '#1a1030', lineHeight: 20 },
+
+  // Student note specifics
+  noteAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#e0dde8', flexShrink: 0 },
+  noteStudentName: { fontFamily: 'Nunito_800ExtraBold', fontSize: 14, color: '#1a1030' },
+  noteTypeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 50, flexShrink: 0 },
+  noteTypeEval: { backgroundColor: 'rgba(123,92,240,0.12)' },
+  noteTypeObs: { backgroundColor: 'rgba(245,158,11,0.12)' },
+  noteTypeBadgeText: { fontFamily: 'Nunito_700Bold', fontSize: 10 },
+  noteTypeEvalText: { color: '#7B5CF0' },
+  noteTypeObsText: { color: '#F59E0B' },
 });

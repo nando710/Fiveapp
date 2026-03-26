@@ -26,7 +26,9 @@ interface StoryViewerProps {
 
 export function StoryViewer({ stories, initialIndex = 0, visible, onClose }: StoryViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [liked, setLiked] = useState<Set<string>>(new Set());
   const progress = useRef(new Animated.Value(0)).current;
+  const likeScale = useRef(new Animated.Value(1)).current;
   const animRef = useRef<Animated.CompositeAnimation | null>(null);
 
   // Reset index when modal opens
@@ -85,8 +87,24 @@ export function StoryViewer({ stories, initialIndex = 0, visible, onClose }: Sto
     advanceNext();
   };
 
+  const handleLike = () => {
+    const id = stories[currentIndex]?.id;
+    if (!id) return;
+    setLiked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    Animated.sequence([
+      Animated.spring(likeScale, { toValue: 1.4, useNativeDriver: true, speed: 50, bounciness: 15 }),
+      Animated.spring(likeScale, { toValue: 1, useNativeDriver: true, speed: 50, bounciness: 10 }),
+    ]).start();
+  };
+
   const story = stories[currentIndex];
   if (!story) return null;
+  const isLiked = liked.has(story.id);
 
   return (
     <Modal visible={visible} animationType="fade" statusBarTranslucent>
@@ -157,6 +175,19 @@ export function StoryViewer({ stories, initialIndex = 0, visible, onClose }: Sto
         <View style={styles.tapZones} pointerEvents="box-none">
           <Pressable style={styles.tapLeft} onPress={handleTapLeft} />
           <Pressable style={styles.tapRight} onPress={handleTapRight} />
+        </View>
+
+        {/* Botão curtir */}
+        <View style={styles.likeRow}>
+          <Pressable onPress={handleLike} hitSlop={12}>
+            <Animated.View style={{ transform: [{ scale: likeScale }] }}>
+              <Ionicons
+                name={isLiked ? 'heart' : 'heart-outline'}
+                size={28}
+                color={isLiked ? '#EF4444' : '#fff'}
+              />
+            </Animated.View>
+          </Pressable>
         </View>
 
       </View>
@@ -249,4 +280,11 @@ const styles = StyleSheet.create({
   },
   tapLeft: { flex: 1 },
   tapRight: { flex: 2 },
+
+  likeRow: {
+    position: 'absolute',
+    bottom: 40,
+    right: 20,
+    alignItems: 'center',
+  },
 });

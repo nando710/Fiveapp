@@ -86,6 +86,8 @@ export default function TeacherProfileScreen() {
           {/* ── Profile Header ── */}
           <Animated.View style={s(0)}>
             <LinearGradient colors={['#7B5CF0', '#4C1D95']} style={styles.profileHeader}>
+              {/* Shine diagonal */}
+              <LinearGradient colors={['rgba(255,255,255,0.18)', 'transparent', 'rgba(0,0,0,0.08)']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} pointerEvents="none" />
               {/* Logout button top-right */}
               <Pressable onPress={logout} style={styles.logoutTopBtn}>
                 <Ionicons name="log-out-outline" size={18} color="rgba(255,255,255,0.7)" />
@@ -303,7 +305,7 @@ const styles = StyleSheet.create({
     width: '47%',
   },
   statShadow: {
-    borderRadius: 16,
+    borderRadius: 18,
     shadowColor: '#7B5CF0',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -311,7 +313,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   statCard: {
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.55)',
     overflow: 'hidden',

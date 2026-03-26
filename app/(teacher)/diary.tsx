@@ -351,7 +351,7 @@ export default function HomeworkReviewScreen() {
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setSelected(null)} />
 
           {selected && (
-            <BlurView intensity={90} tint="light" style={styles.modalSheet}>
+            <BlurView intensity={55} tint="light" style={styles.modalSheet}>
               <View style={styles.modalHandle} />
 
               {/* Header do modal */}
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   answerLabel: { fontFamily: 'Nunito_700Bold', fontSize: 12, color: '#7B5CF0' },
-  answerText:  { fontFamily: 'Nunito_600SemiBold', fontSize: 14, color: '#333', lineHeight: 21 },
+  answerText:  { fontFamily: 'Nunito_600SemiBold', fontSize: 14, color: '#1a1030', lineHeight: 21 },
 
   audioPreview: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   audioPlayBtn: {
